@@ -13,20 +13,19 @@ public class Cell : MonoBehaviour
     public Color Hovered;
 
     Image img;
-
-    public Cell(int _X, int _Y)
-    {
-        X = _X;
-        Y = _Y;
-        img = GetComponent<Image>();
-        img.color = Idle;
-    }
     void Start()
     {
-        
+        //img = GetComponent<Image>();
+        //img.color = Idle;
     }
     void Update()
     {
-        
+
+    }
+
+    [ContextMenu("Data")]
+    public void ChangeColor()
+    {
+        Debug.Log("aboba");
     }
 }
