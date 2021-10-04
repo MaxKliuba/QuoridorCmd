@@ -74,7 +74,7 @@ namespace QuoridorConsole
             Console.WriteLine($" {player2.Name}                          WALLS: {player2.WallCount}");
             Console.WriteLine();
 
-            for (int x = 0; x < board.Size; x++)
+            for (int x = 0; x < Board.Size; x++)
             {
                 if (x == 0)
                 {
@@ -84,11 +84,11 @@ namespace QuoridorConsole
             }
             Console.WriteLine();
 
-            for (int y = 0; y < board.Size; y++)
+            for (int y = 0; y < Board.Size; y++)
             {
                 if (y == 0)
                 {
-                    for (int x = 0; x < board.Size; x++)
+                    for (int x = 0; x < Board.Size; x++)
                     {
                         if (x == 0)
                         {
@@ -99,7 +99,7 @@ namespace QuoridorConsole
                     Console.WriteLine();
                 }
 
-                for (int x = 0; x < board.Size; x++)
+                for (int x = 0; x < Board.Size; x++)
                 {
                     if (x == 0)
                     {
@@ -151,7 +151,7 @@ namespace QuoridorConsole
                 }
                 Console.WriteLine();
 
-                for (int x = 0; x < board.Size; x++)
+                for (int x = 0; x < Board.Size; x++)
                 {
                     if (x == 0)
                     {

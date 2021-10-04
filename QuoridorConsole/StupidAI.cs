@@ -6,13 +6,13 @@ namespace QuoridorConsole
 {
     class StupidAI
     {
-        GameProcess GameProcess { get; }
+        private GameProcess gameProcess;
 
         public Player Player { get; }
 
         public StupidAI(GameProcess gameProcess, Player player)
         {
-            GameProcess = gameProcess;
+            this.gameProcess = gameProcess;
             Player = player;
         }
 
@@ -22,15 +22,30 @@ namespace QuoridorConsole
 
             if (random.Next(0, 2) == 0 && Player.WallCount > 0)
             {
-                while (!GameProcess.AddWall(Player,
-                    new Vector2(random.Next(0, GameProcess.Board.Size - 2), random.Next(0, GameProcess.Board.Size - 2)),
+                while (!gameProcess.AddWall(Player,
+                    new Vector2(random.Next(0, Board.Size - 2), random.Next(0, Board.Size - 2)),
                     random.Next(0, 2) == 0)) ;
             }
             else
             {
-                List<Vector2> availableMoves = GameProcess.GetPlayerAvailableMoves(Player);
+                var dijkstra = new Dijkstra(gameProcess.Board.Graph);
+                var availableMoves = gameProcess.GetPlayerAvailableMoves(Player);
+                List<Vector2> minShortestPath = null;
 
-                while (!GameProcess.MovePlayer(Player, availableMoves[random.Next(0, availableMoves.Count)])) ;
+                foreach (var availableMove in availableMoves) 
+                {
+                    for (int i = 0; i < Board.Size; i++)
+                    {
+                        var shortestPath = dijkstra.FindShortestPath(
+                            new Vector2(i, Player.WinningPositionY),
+                            new Vector2(availableMove.X, availableMove.Y));
+
+                        if (shortestPath != null && ((minShortestPath != null && shortestPath.Count < minShortestPath.Count) || minShortestPath == null))
+                            minShortestPath = shortestPath;
+                    }
+                }
+
+                gameProcess.MovePlayer(Player, minShortestPath[0]);
             }
         }
     }

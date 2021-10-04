@@ -56,47 +56,22 @@ namespace QuoridorConsole
 
         public bool HasPath(Vector2 fromPoint, Vector2 toPoint)
         {
-            return GetShortestPathLength(graph.FindVertex(fromPoint), graph.FindVertex(toPoint)) > -1;
+            return GetShortestPathLength(fromPoint, toPoint) > 0;
         }
 
-        public int GetShortestPathLength(Vector2 fromPoint, Vector2 toPoint)
-        {
-            return GetShortestPathLength(graph.FindVertex(fromPoint), graph.FindVertex(toPoint));
-        }
-
-        public int GetShortestPathLength(GraphVertex fromVertex, GraphVertex toVertex)
-        {
-            if (fromVertex == null || toVertex == null)
-            {
-                return -1;
-            }
-
-            InitInfo();
-
-            var first = GetVertexInfo(fromVertex);
-            first.EdgesWeightSum = 0;
-
-            while (true)
-            {
-                var current = FindUnvisitedVertexWithMinSum();
-
-                if (current == null)
-                {
-                    break;
-                }
-
-                SetSumToNextVertex(current);
-            }
-
-            return GetPathLength(fromVertex, toVertex);
-        }
-
-        public string FindShortestPath(Vector2 fromPoint, Vector2 toPoint)
+        public List<Vector2> FindShortestPath(Vector2 fromPoint, Vector2 toPoint)
         {
             return FindShortestPath(graph.FindVertex(fromPoint), graph.FindVertex(toPoint));
         }
 
-        public string FindShortestPath(GraphVertex fromVertex, GraphVertex toVertex)
+        public int GetShortestPathLength(Vector2 fromPoint, Vector2 toPoint)
+        {
+            var shortestPath = FindShortestPath(graph.FindVertex(fromPoint), graph.FindVertex(toPoint));
+
+            return shortestPath != null ? shortestPath.Count : -1;
+        }
+
+        public List<Vector2> FindShortestPath(GraphVertex fromVertex, GraphVertex toVertex)
         {
             if (fromVertex == null || toVertex == null)
             {
@@ -140,28 +115,11 @@ namespace QuoridorConsole
             }
         }
 
-        private int GetPathLength(GraphVertex fromVertex, GraphVertex toVertex)
+        private List<Vector2> GetPath(GraphVertex fromVertex, GraphVertex toVertex)
         {
-            int pathLength = 0;
+            var path = new List<Vector2>();
 
-            while (fromVertex != toVertex)
-            {
-                toVertex = GetVertexInfo(toVertex).PreviousVertex;
-
-                if (toVertex == null)
-                {
-                    return -1;
-                }
-
-                pathLength++;
-            }
-
-            return pathLength;
-        }
-
-        private string GetPath(GraphVertex fromVertex, GraphVertex toVertex)
-        {
-            var path = toVertex.ToString();
+            path.Add(toVertex.Point);
 
             while (fromVertex != toVertex)
             {
@@ -172,7 +130,7 @@ namespace QuoridorConsole
                     return null;
                 }
 
-                path = toVertex.ToString() + path;
+                path.Add(toVertex.Point);
             }
 
             return path;

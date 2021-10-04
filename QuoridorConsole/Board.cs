@@ -4,13 +4,12 @@ namespace QuoridorConsole
 {
     class Board
     {
-        public int Size { get; }
+        public const int Size = 9;
 
         public Graph Graph { get; }
 
         public Board()
         {
-            Size = 9;
 
             Graph = new Graph();
 
