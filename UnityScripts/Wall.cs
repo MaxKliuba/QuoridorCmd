@@ -13,6 +13,8 @@ public class Wall : MonoBehaviour
             .SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _Width);
         GetComponent<RectTransform>()
             .SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, _Height);
+
+        //GetComponent<RectTransform>().sizeDelta = new Vector2(_Width, _Height);
     }
 
     void Start()

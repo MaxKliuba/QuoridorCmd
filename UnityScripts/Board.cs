@@ -31,8 +31,8 @@ public class Board : MonoBehaviour
         SizePixels = (int)GetComponent<RectTransform>().rect.width;
         Cells = new Cell[Size, Size];
         CellSize = (int)CellPref.GetComponent<RectTransform>().rect.width;
-        WallHeight = (int)WallPref.GetComponent<RectTransform>().rect.height;
-        WallWidth = (int)WallPref.GetComponent<RectTransform>().rect.width;
+        WallHeight = (SizePixels - (2*Margin + Size * CellSize)) / (Size - 1);
+        WallWidth = 2 * CellSize + WallHeight;
         //cell placing
         for (int i = 0; i < Size; i++)
         {
@@ -51,7 +51,7 @@ public class Board : MonoBehaviour
             }
         }
         //wall placing
-        for(int i = 0; i < Size - 1; i++)
+        for (int i = 0; i < Size - 1; i++)
         {
             for (int j = 0; j < Size - 1; j++)
             {
