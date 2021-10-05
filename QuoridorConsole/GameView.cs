@@ -50,12 +50,12 @@ namespace QuoridorConsole
             Console.WriteLine("  Esc - Back / Exit");
             Console.WriteLine(new string('\n', 17));
             Console.WriteLine("---------------------------------------------");
-            Console.WriteLine("                  By MaxClub                 ");
+            Console.WriteLine("               By MaxClub & Co               ");
             Console.WriteLine();
             Console.WriteLine("*********************************************");
         }
 
-        public static void RenderGameBoard(Board board, Player player1, Player player2, bool isPlayer1Move,
+        public static void RenderGameBoard(Board board, Player player1, Player player2, Player currentPlayer,
             List<Wall> walls, List<Vector2> availableMoves, string message)
         {
             const char PLAYER_1_CHAR = '1';
@@ -108,7 +108,7 @@ namespace QuoridorConsole
 
                     if (player1.Position.X.Equals(x) && player1.Position.Y.Equals(y))
                     {
-                        if (isPlayer1Move)
+                        if (player1.Equals(currentPlayer))
                         {
                             cursorPosition.X = Console.CursorLeft;
                             cursorPosition.Y = Console.CursorTop;
@@ -118,7 +118,7 @@ namespace QuoridorConsole
                     }
                     else if (player2.Position.X.Equals(x) && player2.Position.Y.Equals(y))
                     {
-                        if (!isPlayer1Move)
+                        if (player2.Equals(currentPlayer))
                         {
                             cursorPosition.X = Console.CursorLeft;
                             cursorPosition.Y = Console.CursorTop;

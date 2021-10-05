@@ -22,17 +22,17 @@ namespace QuoridorConsole
 
             if (random.Next(0, 2) == 0 && Player.WallCount > 0)
             {
-                while (!gameProcess.AddWall(Player,
+                while (!gameProcess.AddCurrentPlayerWall(
                     new Vector2(random.Next(0, Board.Size - 2), random.Next(0, Board.Size - 2)),
                     random.Next(0, 2) == 0)) ;
             }
             else
             {
                 var dijkstra = new Dijkstra(gameProcess.Board.Graph);
-                var availableMoves = gameProcess.GetPlayerAvailableMoves(Player);
+                var availableMoves = gameProcess.GetCurrentPlayerAvailableMoves();
                 List<Vector2> minShortestPath = null;
 
-                foreach (var availableMove in availableMoves) 
+                foreach (var availableMove in availableMoves)
                 {
                     for (int i = 0; i < Board.Size; i++)
                     {
@@ -45,7 +45,7 @@ namespace QuoridorConsole
                     }
                 }
 
-                gameProcess.MovePlayer(Player, minShortestPath[0]);
+                gameProcess.MoveCurrentPlayer(minShortestPath[0]);
             }
         }
     }

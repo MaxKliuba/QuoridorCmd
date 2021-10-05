@@ -13,6 +13,8 @@ namespace QuoridorConsole
 
         public Player Player2 { get; }
 
+        private bool isPlayer1CurrentPlayer;
+
         public GameProcess()
         {
             Board = new Board();
@@ -21,6 +23,20 @@ namespace QuoridorConsole
 
             Player1 = new Player("PLAYER 1", new Vector2(Board.Size / 2, Board.Size - 1), 0);
             Player2 = new Player("PLAYER 2", new Vector2(Board.Size / 2, 0), Board.Size - 1);
+
+            isPlayer1CurrentPlayer = true;
+        }
+
+        public Player GetCurrentPlayer()
+        {
+            return isPlayer1CurrentPlayer ? Player1 : Player2;
+        }
+
+        public Player ChangeCurrentPlayer()
+        {
+            isPlayer1CurrentPlayer = !isPlayer1CurrentPlayer;
+
+            return GetCurrentPlayer();
         }
 
         public bool HavePlayersPath()
@@ -29,18 +45,10 @@ namespace QuoridorConsole
                && Board.HasPathBetweenPointAndLine(Player2.Position, Player2.WinningPositionY);
         }
 
-        public List<Vector2> GetPlayerAvailableMoves(Player currentPlayer)
+        public List<Vector2> GetCurrentPlayerAvailableMoves()
         {
-            Player anotherPlayer = null;
-
-            if (currentPlayer.Equals(Player1))
-            {
-                anotherPlayer = Player2;
-            }
-            else
-            {
-                anotherPlayer = Player1;
-            }
+            Player currentPlayer = GetCurrentPlayer();
+            Player anotherPlayer = isPlayer1CurrentPlayer ? Player2 : Player1;
 
             List<Vector2> availableMoves = new List<Vector2>();
 
@@ -86,9 +94,11 @@ namespace QuoridorConsole
             return availableMoves;
         }
 
-        public bool MovePlayer(Player currentPlayer, Vector2 position)
+        public bool MoveCurrentPlayer(Vector2 position)
         {
-            List<Vector2> availableMoves = GetPlayerAvailableMoves(currentPlayer);
+            Player currentPlayer = GetCurrentPlayer();
+
+            List<Vector2> availableMoves = GetCurrentPlayerAvailableMoves();
 
             foreach (Vector2 availableMove in availableMoves)
             {
@@ -103,8 +113,10 @@ namespace QuoridorConsole
             return false;
         }
 
-        public bool AddWall(Player currentPlayer, Vector2 leftTopPoint, bool isVertical)
+        public bool AddCurrentPlayerWall(Vector2 leftTopPoint, bool isVertical)
         {
+            Player currentPlayer = GetCurrentPlayer();
+
             Vector2 rightTopPoint = new Vector2();
 
             if (isVertical)
@@ -118,11 +130,13 @@ namespace QuoridorConsole
                 rightTopPoint.Y = leftTopPoint.Y;
             }
 
-            return AddWall(currentPlayer, leftTopPoint, rightTopPoint);
+            return AddCurrentPlayerWall(leftTopPoint, rightTopPoint);
         }
 
-        public bool AddWall(Player currentPlayer, Vector2 leftTopPoint, Vector2 rightTopPoint)
+        public bool AddCurrentPlayerWall(Vector2 leftTopPoint, Vector2 rightTopPoint)
         {
+            Player currentPlayer = GetCurrentPlayer();
+
             if (currentPlayer.WallCount <= 0)
             {
                 return false;
@@ -194,9 +208,9 @@ namespace QuoridorConsole
             return false;
         }
 
-        public bool CheckPlayerWin(Player player)
+        public bool CheckCurrentPlayerWin()
         {
-            return player.Position.Y.Equals(player.WinningPositionY);
+            return GetCurrentPlayer().Position.Y.Equals(GetCurrentPlayer().WinningPositionY);
         }
     }
 }

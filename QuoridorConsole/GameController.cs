@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace QuoridorConsole
@@ -16,8 +17,9 @@ namespace QuoridorConsole
                 if (keyMenu.Key.Equals(ConsoleKey.D1) || keyMenu.Key.Equals(ConsoleKey.D2))
                 {
                     GameProcess gameProcess = new GameProcess();
-                    Player currentPlayer = gameProcess.Player1;
                     StupidAI stupidAI = null;
+                    List<Vector2> availableMoves = null;
+                    string message = GetCurrentPlayerMessage(gameProcess.GetCurrentPlayer().Name);
                     bool gameOver = false;
 
                     if (keyMenu.Key.Equals(ConsoleKey.D1))
@@ -25,37 +27,11 @@ namespace QuoridorConsole
                         stupidAI = new StupidAI(gameProcess, gameProcess.Player2);
                     }
 
-                    GameView.RenderGameBoard(gameProcess.Board, gameProcess.Player1, gameProcess.Player2, currentPlayer.Equals(gameProcess.Player1),
-                        gameProcess.Walls, null, $"> CURRENT PLAYER: {currentPlayer.Name}\n");
+                    GameView.RenderGameBoard(gameProcess.Board, gameProcess.Player1, gameProcess.Player2,
+                        gameProcess.GetCurrentPlayer(), gameProcess.Walls, availableMoves, message);
 
                     while (true)
                     {
-                        if (!gameOver && stupidAI != null && currentPlayer.Equals(stupidAI.Player))
-                        {
-                            stupidAI.Move();
-
-                            gameOver = gameProcess.CheckPlayerWin(currentPlayer);
-                            if (gameOver)
-                            {
-                                GameView.RenderGameBoard(gameProcess.Board, gameProcess.Player1, gameProcess.Player2, currentPlayer.Equals(gameProcess.Player1),
-                                    gameProcess.Walls, null, $"> {currentPlayer.Name} WINS!!!\n");
-
-                                continue;
-                            }
-
-                            if (currentPlayer.Equals(gameProcess.Player1))
-                            {
-                                currentPlayer = gameProcess.Player2;
-                            }
-                            else
-                            {
-                                currentPlayer = gameProcess.Player1;
-                            }
-
-                            GameView.RenderGameBoard(gameProcess.Board, gameProcess.Player1, gameProcess.Player2, currentPlayer.Equals(gameProcess.Player1),
-                                gameProcess.Walls, null, $"> CURRENT PLAYER: {currentPlayer.Name}\n");
-                        }
-
                         var keyGame = Console.ReadKey(true);
 
                         if (keyGame.Key.Equals(ConsoleKey.Escape))
@@ -65,119 +41,126 @@ namespace QuoridorConsole
 
                         if (!gameOver)
                         {
+                            availableMoves = null;
+                            message = null;
+
                             if (keyGame.Key.Equals(ConsoleKey.UpArrow))
                             {
                                 GameView.MoveCursorUp();
+
+                                continue;
                             }
                             else if (keyGame.Key.Equals(ConsoleKey.DownArrow))
                             {
                                 GameView.MoveCursorDown();
+
+                                continue;
                             }
                             else if (keyGame.Key.Equals(ConsoleKey.LeftArrow))
                             {
                                 GameView.MoveCursorLeft();
+
+                                continue;
                             }
                             else if (keyGame.Key.Equals(ConsoleKey.RightArrow))
                             {
                                 GameView.MoveCursorRight();
+
+                                continue;
                             }
                             else if (keyGame.Key.Equals(ConsoleKey.Spacebar))
                             {
-                                GameView.RenderGameBoard(gameProcess.Board, gameProcess.Player1, gameProcess.Player2, currentPlayer.Equals(gameProcess.Player1),
-                                    gameProcess.Walls, gameProcess.GetPlayerAvailableMoves(currentPlayer), $"> CURRENT PLAYER: {currentPlayer.Name}\n");
+                                availableMoves = gameProcess.GetCurrentPlayerAvailableMoves();
+                                message = GetCurrentPlayerMessage(gameProcess.GetCurrentPlayer().Name);
                             }
                             else if (keyGame.Key.Equals(ConsoleKey.Q))
                             {
                                 Vector2 playerMovePosition = GameView.GetPlayerMovePosition();
                                 bool isPlayerMove = false;
-                                string message = null;
 
                                 if (!playerMovePosition.Equals(GameView.WRONG_POSITION))
                                 {
-                                    isPlayerMove = gameProcess.MovePlayer(currentPlayer, playerMovePosition);
+                                    isPlayerMove = gameProcess.MoveCurrentPlayer(playerMovePosition);
                                 }
 
                                 if (!isPlayerMove)
                                 {
-                                    message = $"> CURRENT PLAYER: {currentPlayer.Name}\n" +
-                                            $"> WRONG PLAYER POSITION";
+                                    message = GetCurrentPlayerMessage(gameProcess.GetCurrentPlayer().Name) + GetWrongPlayerPositionMessage();
                                 }
                                 else
                                 {
-                                    gameOver = gameProcess.CheckPlayerWin(currentPlayer);
+                                    gameOver = gameProcess.CheckCurrentPlayerWin();
+
                                     if (gameOver)
                                     {
-                                        GameView.RenderGameBoard(gameProcess.Board, gameProcess.Player1, gameProcess.Player2, currentPlayer.Equals(gameProcess.Player1),
-                                            gameProcess.Walls, null, $"> {currentPlayer.Name} WINS!!!\n");
-
-                                        continue;
-                                    }
-
-                                    if (currentPlayer.Equals(gameProcess.Player1))
-                                    {
-                                        currentPlayer = gameProcess.Player2;
+                                        message = GetWinMessage(gameProcess.GetCurrentPlayer().Name);
                                     }
                                     else
                                     {
-                                        currentPlayer = gameProcess.Player1;
+                                        gameProcess.ChangeCurrentPlayer();
+                                        message = GetCurrentPlayerMessage(gameProcess.GetCurrentPlayer().Name);
                                     }
-
-                                    message = $"> CURRENT PLAYER: {currentPlayer.Name}\n";
                                 }
-
-                                GameView.RenderGameBoard(gameProcess.Board, gameProcess.Player1, gameProcess.Player2, currentPlayer.Equals(gameProcess.Player1),
-                                    gameProcess.Walls, null, message);
                             }
                             else if (keyGame.Key.Equals(ConsoleKey.W))
                             {
                                 Vector2[] wallPosition = GameView.GetWallPosition();
                                 bool isWallAdded = false;
-                                string message = null;
 
                                 if (!wallPosition[0].Equals(GameView.WRONG_POSITION) && !wallPosition[1].Equals(GameView.WRONG_POSITION))
                                 {
-                                    isWallAdded = gameProcess.AddWall(currentPlayer, wallPosition[0], wallPosition[1]);
+                                    isWallAdded = gameProcess.AddCurrentPlayerWall(wallPosition[0], wallPosition[1]);
                                 }
 
                                 if (!isWallAdded)
                                 {
-                                    if (currentPlayer.WallCount > 0)
+                                    if (gameProcess.GetCurrentPlayer().WallCount > 0)
                                     {
-                                        message = $"> CURRENT PLAYER: {currentPlayer.Name}\n" +
-                                            $"> WRONG WALL POSITION";
+                                        message = GetCurrentPlayerMessage(gameProcess.GetCurrentPlayer().Name) + GetWrongWallPositionMessage();
                                     }
                                     else
                                     {
-                                        message = $"> CURRENT PLAYER: {currentPlayer.Name}\n" +
-                                            "> THE WALLS ARE OVER";
+                                        message = GetCurrentPlayerMessage(gameProcess.GetCurrentPlayer().Name) + GetWallsAreOverMessage();
                                     }
                                 }
                                 else
                                 {
-                                    gameOver = gameProcess.CheckPlayerWin(currentPlayer);
+                                    gameOver = gameProcess.CheckCurrentPlayerWin();
+
                                     if (gameOver)
                                     {
-                                        GameView.RenderGameBoard(gameProcess.Board, gameProcess.Player1, gameProcess.Player2, currentPlayer.Equals(gameProcess.Player1),
-                                            gameProcess.Walls, null, $"> {currentPlayer.Name} WINS!!!\n");
-
-                                        continue;
-                                    }
-
-                                    if (currentPlayer.Equals(gameProcess.Player1))
-                                    {
-                                        currentPlayer = gameProcess.Player2;
+                                        message = GetWinMessage(gameProcess.GetCurrentPlayer().Name);
                                     }
                                     else
                                     {
-                                        currentPlayer = gameProcess.Player1;
+                                        gameProcess.ChangeCurrentPlayer();
+                                        message = GetCurrentPlayerMessage(gameProcess.GetCurrentPlayer().Name);
                                     }
-
-                                    message = $"> CURRENT PLAYER: {currentPlayer.Name}\n";
                                 }
-
-                                GameView.RenderGameBoard(gameProcess.Board, gameProcess.Player1, gameProcess.Player2, currentPlayer.Equals(gameProcess.Player1),
-                                    gameProcess.Walls, null, message);
                             }
+
+                            GameView.RenderGameBoard(gameProcess.Board, gameProcess.Player1, gameProcess.Player2,
+                                            gameProcess.GetCurrentPlayer(), gameProcess.Walls, availableMoves, message);
+                        }
+
+                        if (!gameOver && stupidAI != null && gameProcess.GetCurrentPlayer().Equals(stupidAI.Player))
+                        {
+                            stupidAI.Move();
+
+                            gameOver = gameProcess.CheckCurrentPlayerWin();
+
+                            if (gameOver)
+                            {
+                                message = GetWinMessage(gameProcess.GetCurrentPlayer().Name);
+                            }
+                            else
+                            {
+                                gameProcess.ChangeCurrentPlayer();
+                                message = GetCurrentPlayerMessage(gameProcess.GetCurrentPlayer().Name);
+                            }
+
+                            GameView.RenderGameBoard(gameProcess.Board, gameProcess.Player1, gameProcess.Player2,
+                                    gameProcess.GetCurrentPlayer(), gameProcess.Walls, null, message);
                         }
                     }
 
@@ -206,6 +189,31 @@ namespace QuoridorConsole
                     break;
                 }
             }
+        }
+
+        private static string GetCurrentPlayerMessage(string playerName)
+        {
+            return $"> CURRENT PLAYER: {playerName}\n";
+        }
+
+        private static string GetWrongPlayerPositionMessage()
+        {
+            return $"> WRONG PLAYER POSITION";
+        }
+
+        private static string GetWrongWallPositionMessage()
+        {
+            return $"> WRONG WALL POSITION";
+        }
+
+        private static string GetWallsAreOverMessage()
+        {
+            return "> THE WALLS ARE OVER";
+        }
+
+        private static string GetWinMessage(string playerName)
+        {
+            return $"> {playerName} WINS!!!\n";
         }
     }
 }
