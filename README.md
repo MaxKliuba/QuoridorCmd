@@ -7,7 +7,7 @@
 
 ## Скріншоти проекту
 - Меню гри
-![DISPLAYS](https://github.com/MaxKliuba/QuoridorConsole/tree/master/img/img1.jpg)
+![Menu](https://github.com/MaxKliuba/QuoridorConsole/blob/master/img/img1.jpg?raw=true)
 
 - Ігрове поле
-![DISPLAYS](https://github.com/MaxKliuba/QuoridorConsole/tree/master/img/img2.jpg)
+![Game board](https://github.com/MaxKliuba/QuoridorConsole/blob/master/img/img2.jpg?raw=true)
