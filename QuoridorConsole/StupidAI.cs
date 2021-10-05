@@ -10,43 +10,93 @@ namespace QuoridorConsole
 
         public Player Player { get; }
 
+        private Dijkstra dijkstra;
+
         public StupidAI(GameProcess gameProcess, Player player)
         {
             this.gameProcess = gameProcess;
             Player = player;
+            dijkstra = new Dijkstra(gameProcess.Board.Graph);
         }
 
         public void Move()
         {
+            bool isWallAdded = false;
+
             Random random = new Random();
 
-            if (random.Next(0, 2) == 0 && Player.WallCount > 0)
-            {
-                while (!gameProcess.AddCurrentPlayerWall(
-                    new Vector2(random.Next(0, Board.Size - 2), random.Next(0, Board.Size - 2)),
-                    random.Next(0, 2) == 0)) ;
-            }
-            else
-            {
-                var dijkstra = new Dijkstra(gameProcess.Board.Graph);
-                var availableMoves = gameProcess.GetCurrentPlayerAvailableMoves();
-                List<Vector2> minShortestPath = null;
+            List<Vector2> currentPlayerMinShortestPath = GetMinShortestPath(Player, gameProcess.GetCurrentPlayerAvailableMoves());
+            List<Vector2> anotherPlayerMinShortestPath = GetMinShortestPath(gameProcess.GetAnotherPlayer(), gameProcess.GetAnotherPlayerAvailableMoves());
 
-                foreach (var availableMove in availableMoves)
+            if (currentPlayerMinShortestPath.Count > 1 && (anotherPlayerMinShortestPath.Count <= 1 || (random.Next(0, 3) == 0 && Player.WallCount > 0)))
+            {
+                Vector2 anotherPlayerPosition = gameProcess.GetAnotherPlayer().Position;
+                Vector2 minShortestPathNextPosition = anotherPlayerMinShortestPath[0];
+                Vector2 wallLeftTopPoint = new Vector2();
+                Vector2 wallRightTopPoint = new Vector2();
+
+                if (anotherPlayerPosition.X.Equals(minShortestPathNextPosition.X))
                 {
-                    for (int i = 0; i < Board.Size; i++)
+                    if (anotherPlayerPosition.Y < minShortestPathNextPosition.Y)
                     {
-                        var shortestPath = dijkstra.FindShortestPath(
-                            new Vector2(i, Player.WinningPositionY),
-                            new Vector2(availableMove.X, availableMove.Y));
-
-                        if (shortestPath != null && ((minShortestPath != null && shortestPath.Count < minShortestPath.Count) || minShortestPath == null))
-                            minShortestPath = shortestPath;
+                        wallLeftTopPoint.X = anotherPlayerPosition.X;
+                        wallLeftTopPoint.Y = minShortestPathNextPosition.Y;
+                        wallRightTopPoint.X = anotherPlayerPosition.X;
+                        wallRightTopPoint.Y = anotherPlayerPosition.Y;
+                    }
+                    else
+                    {
+                        wallLeftTopPoint.X = anotherPlayerPosition.X;
+                        wallLeftTopPoint.Y = anotherPlayerPosition.Y;
+                        wallRightTopPoint.X = anotherPlayerPosition.X;
+                        wallRightTopPoint.Y = minShortestPathNextPosition.Y;
+                    }
+                }
+                else if (anotherPlayerPosition.Y.Equals(minShortestPathNextPosition.Y))
+                {
+                    if (anotherPlayerPosition.X < minShortestPathNextPosition.X)
+                    {
+                        wallLeftTopPoint.X = anotherPlayerPosition.X;
+                        wallLeftTopPoint.Y = anotherPlayerPosition.Y;
+                        wallRightTopPoint.X = minShortestPathNextPosition.X;
+                        wallRightTopPoint.Y = anotherPlayerPosition.Y;
+                    }
+                    else
+                    {
+                        wallLeftTopPoint.X = minShortestPathNextPosition.X;
+                        wallLeftTopPoint.Y = anotherPlayerPosition.Y;
+                        wallRightTopPoint.X = anotherPlayerPosition.X;
+                        wallRightTopPoint.Y = anotherPlayerPosition.Y;
                     }
                 }
 
-                gameProcess.MoveCurrentPlayer(minShortestPath[0]);
+                isWallAdded = gameProcess.AddCurrentPlayerWall(wallLeftTopPoint, wallRightTopPoint);
             }
+
+            if (!isWallAdded)
+            {
+                gameProcess.MoveCurrentPlayer(currentPlayerMinShortestPath[0]);
+            }
+        }
+
+        private List<Vector2> GetMinShortestPath(Player player, List<Vector2> availableMoves)
+        {
+            List<Vector2> minShortestPath = null;
+
+            foreach (var availableMove in availableMoves)
+            {
+                for (int i = 0; i < Board.Size; i++)
+                {
+                    var shortestPath = dijkstra.FindShortestPath(
+                        new Vector2(i, player.WinningPositionY),
+                        new Vector2(availableMove.X, availableMove.Y));
+
+                    if (shortestPath != null && ((minShortestPath != null && shortestPath.Count < minShortestPath.Count) || minShortestPath == null))
+                        minShortestPath = shortestPath;
+                }
+            }
+
+            return minShortestPath;
         }
     }
 }

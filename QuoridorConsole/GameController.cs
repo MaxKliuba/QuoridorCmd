@@ -138,6 +138,10 @@ namespace QuoridorConsole
                                     }
                                 }
                             }
+                            else
+                            {
+                                continue;
+                            }
 
                             GameView.RenderGameBoard(gameProcess.Board, gameProcess.Player1, gameProcess.Player2,
                                             gameProcess.GetCurrentPlayer(), gameProcess.Walls, availableMoves, message);

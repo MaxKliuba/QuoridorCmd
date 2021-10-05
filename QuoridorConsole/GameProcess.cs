@@ -32,6 +32,11 @@ namespace QuoridorConsole
             return isPlayer1CurrentPlayer ? Player1 : Player2;
         }
 
+        public Player GetAnotherPlayer()
+        {
+            return isPlayer1CurrentPlayer ? Player2 : Player1;
+        }
+
         public Player ChangeCurrentPlayer()
         {
             isPlayer1CurrentPlayer = !isPlayer1CurrentPlayer;
@@ -47,9 +52,16 @@ namespace QuoridorConsole
 
         public List<Vector2> GetCurrentPlayerAvailableMoves()
         {
-            Player currentPlayer = GetCurrentPlayer();
-            Player anotherPlayer = isPlayer1CurrentPlayer ? Player2 : Player1;
+            return GetPlayerAvailableMoves(GetCurrentPlayer(), GetAnotherPlayer());
+        }
 
+        public List<Vector2> GetAnotherPlayerAvailableMoves()
+        {
+            return GetPlayerAvailableMoves(GetAnotherPlayer(), GetCurrentPlayer());
+        }
+
+        private List<Vector2> GetPlayerAvailableMoves(Player currentPlayer, Player anotherPlayer)
+        {
             List<Vector2> availableMoves = new List<Vector2>();
 
             foreach (var edge in Board.Graph.FindVertex(currentPlayer.Position).Edges)
