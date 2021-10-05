@@ -28,49 +28,58 @@ namespace QuoridorConsole
             List<Vector2> currentPlayerMinShortestPath = GetMinShortestPath(Player, gameProcess.GetCurrentPlayerAvailableMoves());
             List<Vector2> anotherPlayerMinShortestPath = GetMinShortestPath(gameProcess.GetAnotherPlayer(), gameProcess.GetAnotherPlayerAvailableMoves());
 
-            if (currentPlayerMinShortestPath.Count > 1 && (anotherPlayerMinShortestPath.Count <= 1 || (random.Next(0, 3) == 0 && Player.WallCount > 0)))
+            if (currentPlayerMinShortestPath.Count > 1 && (anotherPlayerMinShortestPath.Count <= 2 || (random.Next(0, 4) == 0 && Player.WallCount > 0
+                && currentPlayerMinShortestPath.Count > anotherPlayerMinShortestPath.Count)))
             {
                 Vector2 anotherPlayerPosition = gameProcess.GetAnotherPlayer().Position;
                 Vector2 minShortestPathNextPosition = anotherPlayerMinShortestPath[0];
                 Vector2 wallLeftTopPoint = new Vector2();
                 Vector2 wallRightTopPoint = new Vector2();
 
-                if (anotherPlayerPosition.X.Equals(minShortestPathNextPosition.X))
+                for (int i = 0; i < 2; i++)
                 {
-                    if (anotherPlayerPosition.Y < minShortestPathNextPosition.Y)
+                    if (anotherPlayerPosition.X.Equals(minShortestPathNextPosition.X))
                     {
-                        wallLeftTopPoint.X = anotherPlayerPosition.X;
-                        wallLeftTopPoint.Y = minShortestPathNextPosition.Y;
-                        wallRightTopPoint.X = anotherPlayerPosition.X;
-                        wallRightTopPoint.Y = anotherPlayerPosition.Y;
+                        if (anotherPlayerPosition.Y < minShortestPathNextPosition.Y)
+                        {
+                            wallLeftTopPoint.X = anotherPlayerPosition.X - i;
+                            wallLeftTopPoint.Y = minShortestPathNextPosition.Y;
+                            wallRightTopPoint.X = anotherPlayerPosition.X - i;
+                            wallRightTopPoint.Y = anotherPlayerPosition.Y;
+                        }
+                        else
+                        {
+                            wallLeftTopPoint.X = anotherPlayerPosition.X - i;
+                            wallLeftTopPoint.Y = anotherPlayerPosition.Y;
+                            wallRightTopPoint.X = anotherPlayerPosition.X - i;
+                            wallRightTopPoint.Y = minShortestPathNextPosition.Y;
+                        }
                     }
-                    else
+                    else if (anotherPlayerPosition.Y.Equals(minShortestPathNextPosition.Y))
                     {
-                        wallLeftTopPoint.X = anotherPlayerPosition.X;
-                        wallLeftTopPoint.Y = anotherPlayerPosition.Y;
-                        wallRightTopPoint.X = anotherPlayerPosition.X;
-                        wallRightTopPoint.Y = minShortestPathNextPosition.Y;
+                        if (anotherPlayerPosition.X < minShortestPathNextPosition.X)
+                        {
+                            wallLeftTopPoint.X = anotherPlayerPosition.X;
+                            wallLeftTopPoint.Y = anotherPlayerPosition.Y - i;
+                            wallRightTopPoint.X = minShortestPathNextPosition.X;
+                            wallRightTopPoint.Y = anotherPlayerPosition.Y - i;
+                        }
+                        else
+                        {
+                            wallLeftTopPoint.X = minShortestPathNextPosition.X;
+                            wallLeftTopPoint.Y = anotherPlayerPosition.Y - i;
+                            wallRightTopPoint.X = anotherPlayerPosition.X;
+                            wallRightTopPoint.Y = anotherPlayerPosition.Y - i;
+                        }
                     }
-                }
-                else if (anotherPlayerPosition.Y.Equals(minShortestPathNextPosition.Y))
-                {
-                    if (anotherPlayerPosition.X < minShortestPathNextPosition.X)
-                    {
-                        wallLeftTopPoint.X = anotherPlayerPosition.X;
-                        wallLeftTopPoint.Y = anotherPlayerPosition.Y;
-                        wallRightTopPoint.X = minShortestPathNextPosition.X;
-                        wallRightTopPoint.Y = anotherPlayerPosition.Y;
-                    }
-                    else
-                    {
-                        wallLeftTopPoint.X = minShortestPathNextPosition.X;
-                        wallLeftTopPoint.Y = anotherPlayerPosition.Y;
-                        wallRightTopPoint.X = anotherPlayerPosition.X;
-                        wallRightTopPoint.Y = anotherPlayerPosition.Y;
-                    }
-                }
 
-                isWallAdded = gameProcess.AddCurrentPlayerWall(wallLeftTopPoint, wallRightTopPoint);
+                    isWallAdded = gameProcess.AddCurrentPlayerWall(wallLeftTopPoint, wallRightTopPoint);
+
+                    if (isWallAdded)
+                    {
+                        break;
+                    }
+                }
             }
 
             if (!isWallAdded)
