@@ -1,8 +1,8 @@
-﻿using System;
+﻿using QuoridorCmd.Model;
+using System;
 using System.Collections.Generic;
-using System.Numerics;
 
-namespace QuoridorConsole
+namespace QuoridorCmd.View
 {
     class GameView
     {
@@ -10,7 +10,7 @@ namespace QuoridorConsole
 
         private const int HEIGHT = 32;
 
-        public static Vector2 WRONG_POSITION = new Vector2(-1, -1);
+        public static Position WRONG_POSITION = new Position(-1, -1);
 
         public static void RenderMenu()
         {
@@ -46,9 +46,10 @@ namespace QuoridorConsole
             Console.WriteLine("  Space - show available moves");
             Console.WriteLine("  Arrows - select position");
             Console.WriteLine("  Q - move player");
-            Console.WriteLine("  W - set wall");
+            Console.WriteLine("  W - set vertical wall");
+            Console.WriteLine("  E - set horizontal wall");
             Console.WriteLine("  Esc - Back / Exit");
-            Console.WriteLine(new string('\n', 17));
+            Console.WriteLine(new string('\n', 16));
             Console.WriteLine("---------------------------------------------");
             Console.WriteLine("               By MaxClub & Co               ");
             Console.WriteLine();
@@ -56,14 +57,17 @@ namespace QuoridorConsole
         }
 
         public static void RenderGameBoard(Board board, Player player1, Player player2, Player currentPlayer,
-            List<Wall> walls, List<Vector2> availableMoves, string message)
+            List<Wall> walls, List<Position> availableMoves, string message)
         {
+            char[] CELL_NUMBERING_CHARS = { '_', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', };
+            char[] WALL_NUMBERING_CHARS = { '_', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', };
+
             const char PLAYER_1_CHAR = '1';
             const char PLAYER_2_CHAR = '2';
             const char WALL_CHAR = '█';
             const char AVAILABLE_MOVES_CHAR = '#';
 
-            Vector2 cursorPosition = new Vector2(0, 0);
+            Position cursorPosition = new Position(1, 1);
 
             Console.SetWindowSize(WIDTH, HEIGHT);
             Console.Clear();
@@ -74,23 +78,23 @@ namespace QuoridorConsole
             Console.WriteLine($" {player2.Name}                          WALLS: {player2.WallCount}");
             Console.WriteLine();
 
-            for (int x = 0; x < Board.Size; x++)
+            for (int x = 1; x <= Board.SIZE; x++)
             {
-                if (x == 0)
+                if (x == 1)
                 {
                     Console.Write("  ");
                 }
-                Console.Write($" {x}");
+                Console.Write($" {CELL_NUMBERING_CHARS[x]}");
             }
             Console.WriteLine();
 
-            for (int y = 0; y < Board.Size; y++)
+            for (int y = 1; y <= Board.SIZE; y++)
             {
-                if (y == 0)
+                if (y == 1) // верхня грань
                 {
-                    for (int x = 0; x < Board.Size; x++)
+                    for (int x = 1; x <= Board.SIZE; x++)
                     {
-                        if (x == 0)
+                        if (x == 1)
                         {
                             Console.Write("  +");
                         }
@@ -99,36 +103,34 @@ namespace QuoridorConsole
                     Console.WriteLine();
                 }
 
-                for (int x = 0; x < Board.Size; x++)
+                for (int x = 1; x <= Board.SIZE; x++) // клітинки і перестінки між ними
                 {
-                    if (x == 0)
+                    if (x == 1)
                     {
                         Console.Write($" {y}|");
                     }
 
-                    if (player1.Position.X.Equals(x) && player1.Position.Y.Equals(y))
+                    if (player1.Position.Coordinate.X.Equals(x) && player1.Position.Coordinate.Y.Equals(y))
                     {
                         if (player1.Equals(currentPlayer))
                         {
-                            cursorPosition.X = Console.CursorLeft;
-                            cursorPosition.Y = Console.CursorTop;
+                            cursorPosition.SetCoordinate(Console.CursorLeft, Console.CursorTop);
                         }
 
                         Console.Write(PLAYER_1_CHAR);
                     }
-                    else if (player2.Position.X.Equals(x) && player2.Position.Y.Equals(y))
+                    else if (player2.Position.Coordinate.X.Equals(x) && player2.Position.Coordinate.Y.Equals(y))
                     {
                         if (player2.Equals(currentPlayer))
                         {
-                            cursorPosition.X = Console.CursorLeft;
-                            cursorPosition.Y = Console.CursorTop;
+                            cursorPosition.SetCoordinate(Console.CursorLeft, Console.CursorTop);
                         }
 
                         Console.Write(PLAYER_2_CHAR);
                     }
                     else
                     {
-                        if (ContainAvailableMovesPosition(availableMoves, new Vector2(x, y)))
+                        if (ContainAvailableMovesPosition(availableMoves, new Position(x, y)))
                         {
                             Console.Write(AVAILABLE_MOVES_CHAR);
                         }
@@ -138,8 +140,8 @@ namespace QuoridorConsole
                         }
                     }
 
-                    if (FindWallByLeftTopPoint(walls, true, new Vector2(x, y)) != null
-                        || FindWallByLeftBottomPoint(walls, true, new Vector2(x, y)) != null)
+                    if (FindWallByLeftTopPosition(walls, new Position(x, y - 1), true) != null
+                        || FindWallByLeftTopPosition(walls, new Position(x, y), true) != null)
                     {
                         Console.Write(WALL_CHAR);
                     }
@@ -151,15 +153,15 @@ namespace QuoridorConsole
                 }
                 Console.WriteLine();
 
-                for (int x = 0; x < Board.Size; x++)
+                for (int x = 1; x <= Board.SIZE; x++) // горизонтальний перестінок між рядами клітинок
                 {
-                    if (x == 0)
+                    if (x == 1)
                     {
                         Console.Write("  +");
                     }
 
-                    if (FindWallByRightTopPoint(walls, false, new Vector2(x, y)) != null ||
-                        FindWallByRightBottomPoint(walls, false, new Vector2(x, y)) != null)
+                    if (FindWallByLeftTopPosition(walls, new Position(x - 1, y), false) != null ||
+                        FindWallByLeftTopPosition(walls, new Position(x, y), false) != null)
                     {
                         Console.Write(WALL_CHAR);
                     }
@@ -168,8 +170,8 @@ namespace QuoridorConsole
                         Console.Write("-");
                     }
 
-                    if (FindWallByLeftTopPoint(walls, true, new Vector2(x, y)) != null ||
-                        FindWallByRightTopPoint(walls, false, new Vector2(x, y)) != null)
+                    if (FindWallByLeftTopPosition(walls, new Position(x, y), true) != null ||
+                        FindWallByLeftTopPosition(walls, new Position(x, y), false) != null)
                     {
                         Console.Write(WALL_CHAR);
                     }
@@ -177,9 +179,24 @@ namespace QuoridorConsole
                     {
                         Console.Write("+");
                     }
+
+                    if (x == Board.SIZE && y != Board.SIZE)
+                    {
+                        Console.Write($"{y}");
+                    }
                 }
                 Console.WriteLine();
             }
+
+            for (int x = 1; x < Board.SIZE; x++)
+            {
+                if (x == 1)
+                {
+                    Console.Write("   ");
+                }
+                Console.Write($" {WALL_NUMBERING_CHARS[x]}");
+            }
+            Console.WriteLine();
 
             Console.WriteLine();
             Console.WriteLine($" {player1.Name}                          WALLS: {player1.WallCount}");
@@ -187,7 +204,7 @@ namespace QuoridorConsole
             Console.WriteLine(message);
             Console.WriteLine("*********************************************");
 
-            Console.SetCursorPosition((int)cursorPosition.X, (int)cursorPosition.Y);
+            Console.SetCursorPosition((int)cursorPosition.Coordinate.X, (int)cursorPosition.Coordinate.Y);
         }
 
         public static void MoveCursorUp()
@@ -210,18 +227,18 @@ namespace QuoridorConsole
             Console.SetCursorPosition(Math.Min(Console.CursorLeft + 1, 19), Console.CursorTop);
         }
 
-        public static Vector2 GetPlayerMovePosition()
+        public static Position GetPlayerMovePosition()
         {
-            Vector2 cursorPositionOnBoard = GetCursorPositionOnBoard();
+            Position cursorPositionOnBoard = GetCursorPositionOnBoard();
 
             if (cursorPositionOnBoard.Equals(WRONG_POSITION))
             {
                 return WRONG_POSITION;
             }
 
-            if ((int)cursorPositionOnBoard.X % 2 == 0 && (int)cursorPositionOnBoard.Y % 2 == 0)
+            if ((int)cursorPositionOnBoard.Coordinate.X % 2 != 0 && (int)cursorPositionOnBoard.Coordinate.Y % 2 != 0)
             {
-                return new Vector2((int)cursorPositionOnBoard.X / 2, (int)cursorPositionOnBoard.Y / 2);
+                return new Position((int)(cursorPositionOnBoard.Coordinate.X / 2) + 1, (int)(cursorPositionOnBoard.Coordinate.Y / 2) + 1);
             }
             else
             {
@@ -229,56 +246,46 @@ namespace QuoridorConsole
             }
         }
 
-        public static Vector2[] GetWallPosition()
+        public static Position GetWallPosition()
         {
-            Vector2 cursorPositionOnBoard = GetCursorPositionOnBoard();
+            Position cursorPositionOnBoard = GetCursorPositionOnBoard();
 
             if (cursorPositionOnBoard.Equals(WRONG_POSITION))
-            {
-                return new Vector2[] { WRONG_POSITION, WRONG_POSITION, };
-            }
-
-            if ((int)cursorPositionOnBoard.X % 2 != 0 && (int)cursorPositionOnBoard.Y % 2 == 0)
-            {
-                return new Vector2[] {
-                    new Vector2 ((int)cursorPositionOnBoard.X / 2, (int)cursorPositionOnBoard.Y / 2),
-                    new Vector2 (((int)cursorPositionOnBoard.X / 2) + 1, (int)cursorPositionOnBoard.Y / 2),
-                };
-            }
-            else if ((int)cursorPositionOnBoard.X % 2 == 0 && (int)cursorPositionOnBoard.Y % 2 != 0)
-            {
-                return new Vector2[] {
-                    new Vector2 ((int)cursorPositionOnBoard.X / 2, ((int)cursorPositionOnBoard.Y / 2) + 1),
-                    new Vector2 ((int)cursorPositionOnBoard.X / 2, (int)cursorPositionOnBoard.Y / 2),
-                };
-            }
-            else
-            {
-                return new Vector2[] { WRONG_POSITION, WRONG_POSITION, };
-            }
-        }
-
-        public static Vector2 GetCursorPositionOnBoard()
-        {
-            int cursorLeft = Console.CursorLeft - 3;
-            int cursorTop = Console.CursorTop - 7;
-
-            if (cursorLeft < 0 || cursorLeft > 16 || cursorTop < 0 || cursorTop > 16)
             {
                 return WRONG_POSITION;
             }
 
-            return new Vector2(cursorLeft, cursorTop);
+            if ((int)cursorPositionOnBoard.Coordinate.X % 2 == 0 && (int)cursorPositionOnBoard.Coordinate.Y % 2 == 0)
+            {
+                return new Position((int)cursorPositionOnBoard.Coordinate.X / 2, (int)cursorPositionOnBoard.Coordinate.Y / 2);
+            }
+            else
+            {
+                return WRONG_POSITION;
+            }
         }
 
-        private static bool ContainAvailableMovesPosition(List<Vector2> availableMoves, Vector2 position)
+        public static Position GetCursorPositionOnBoard()
+        {
+            int cursorLeft = Console.CursorLeft - 2;
+            int cursorTop = Console.CursorTop - 6;
+
+            if (cursorLeft < 1 || cursorLeft > 17 || cursorTop < 1 || cursorTop > 17)
+            {
+                return WRONG_POSITION;
+            }
+
+            return new Position(cursorLeft, cursorTop);
+        }
+
+        private static bool ContainAvailableMovesPosition(List<Position> availableMoves, Position position)
         {
             if (availableMoves == null)
             {
                 return false;
             }
 
-            foreach (Vector2 availableMove in availableMoves)
+            foreach (Position availableMove in availableMoves)
             {
                 if (availableMove.Equals(position))
                 {
@@ -289,50 +296,11 @@ namespace QuoridorConsole
             return false;
         }
 
-        private static Wall FindWallByLeftTopPoint(List<Wall> walls, bool isVertical, Vector2 point)
+        private static Wall FindWallByLeftTopPosition(List<Wall> walls, Position point, bool isVertical)
         {
             foreach (Wall wall in walls)
             {
-                if (wall.LeftTopPoint.Equals(point) && wall.IsVertical.Equals(isVertical))
-                {
-                    return wall;
-                }
-            }
-
-            return null;
-        }
-
-        private static Wall FindWallByRightTopPoint(List<Wall> walls, bool isVertical, Vector2 point)
-        {
-            foreach (Wall wall in walls)
-            {
-                if (wall.RightTopPoint.Equals(point) && wall.IsVertical.Equals(isVertical))
-                {
-                    return wall;
-                }
-            }
-
-            return null;
-        }
-
-        private static Wall FindWallByLeftBottomPoint(List<Wall> walls, bool isVertical, Vector2 point)
-        {
-            foreach (Wall wall in walls)
-            {
-                if (wall.LeftBottomPoint.Equals(point) && wall.IsVertical.Equals(isVertical))
-                {
-                    return wall;
-                }
-            }
-
-            return null;
-        }
-
-        private static Wall FindWallByRightBottomPoint(List<Wall> walls, bool isVertical, Vector2 point)
-        {
-            foreach (Wall wall in walls)
-            {
-                if (wall.RightBottomPoint.Equals(point) && wall.IsVertical.Equals(isVertical))
+                if (wall.LeftTopPosition.Equals(point) && wall.IsVertical.Equals(isVertical))
                 {
                     return wall;
                 }

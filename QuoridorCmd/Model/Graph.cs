@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Numerics;
 
-namespace QuoridorConsole
+namespace QuoridorCmd.Model
 {
-    public class Graph
+    class Graph
     {
         public List<GraphVertex> Vertices { get; }
 
@@ -12,16 +11,16 @@ namespace QuoridorConsole
             Vertices = new List<GraphVertex>();
         }
 
-        public void AddVertex(Vector2 point)
+        public void AddVertex(Position position)
         {
-            Vertices.Add(new GraphVertex(point));
+            Vertices.Add(new GraphVertex(position));
         }
 
-        public GraphVertex FindVertex(Vector2 point)
+        public GraphVertex FindVertex(Position position)
         {
             foreach (var v in Vertices)
             {
-                if (v.Point.Equals(point))
+                if (v.Position.Equals(position))
                 {
                     return v;
                 }
@@ -30,15 +29,15 @@ namespace QuoridorConsole
             return null;
         }
 
-        public void AddEdge(Vector2 point1, Vector2 point2, int weight)
+        public void AddEdge(Position position1, Position position2, int weight)
         {
-            var v1 = FindVertex(point1);
-            var v2 = FindVertex(point2);
+            var v1 = FindVertex(position1);
+            var v2 = FindVertex(position2);
 
             if (v2 != null && v1 != null)
             {
-                var e1 = v1.FindEdge(point2);
-                var e2 = v2.FindEdge(point1);
+                var e1 = v1.FindEdge(position2);
+                var e2 = v2.FindEdge(position1);
 
                 if (e2 == null && e1 == null)
                 {
@@ -48,15 +47,15 @@ namespace QuoridorConsole
             }
         }
 
-        public void RemoveEdge(Vector2 point1, Vector2 point2)
+        public void RemoveEdge(Position position1, Position position2)
         {
-            var v1 = FindVertex(point1);
-            var v2 = FindVertex(point2);
+            var v1 = FindVertex(position1);
+            var v2 = FindVertex(position2);
 
             if (v2 != null && v1 != null)
             {
-                var e1 = v1.FindEdge(point2);
-                var e2 = v2.FindEdge(point1);
+                var e1 = v1.FindEdge(position2);
+                var e2 = v2.FindEdge(position1);
 
                 if (e2 != null && e1 != null)
                 {

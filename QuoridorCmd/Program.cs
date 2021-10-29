@@ -1,4 +1,6 @@
-﻿namespace QuoridorConsole
+﻿using QuoridorCmd.Controller;
+
+namespace Quoridor.AiTester
 {
     class Program
     {

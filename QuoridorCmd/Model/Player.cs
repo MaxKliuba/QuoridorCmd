@@ -1,22 +1,31 @@
-﻿using System.Numerics;
-
-namespace QuoridorConsole
+﻿namespace QuoridorCmd.Model
 {
     class Player
     {
         public string Name { get; }
 
-        public Vector2 Position { get; set; }
+        public PlayerColor Color { get; }
+
+        public Position Position { get; set; }
 
         public int WinningPositionY { get; }
 
         public int WallCount { get; set; }
 
-        public Player(string name, Vector2 position, int winningPositionY)
+        public Player(string name, PlayerColor color)
         {
             Name = name;
-            Position = position;
-            WinningPositionY = winningPositionY;
+            Color = color;
+            if (color == PlayerColor.White)
+            {
+                Position = new Position(5, 9);
+                WinningPositionY = 1;
+            }
+            else
+            {
+                Position = new Position(5, 1);
+                WinningPositionY = 9;
+            }
             WallCount = 10;
         }
 

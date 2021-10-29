@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Numerics;
 
-namespace QuoridorConsole
+namespace QuoridorCmd.Model
 {
     class Dijkstra
     {
@@ -54,24 +53,24 @@ namespace QuoridorConsole
             return minVertexInfo;
         }
 
-        public bool HasPath(Vector2 fromPoint, Vector2 toPoint)
+        public bool HasPath(Position fromPosition, Position toPosition)
         {
-            return GetShortestPathLength(fromPoint, toPoint) > 0;
+            return GetShortestPathLength(fromPosition, toPosition) > 0;
         }
 
-        public List<Vector2> FindShortestPath(Vector2 fromPoint, Vector2 toPoint)
+        public List<Position> FindShortestPath(Position fromPosition, Position toPosition)
         {
-            return FindShortestPath(graph.FindVertex(fromPoint), graph.FindVertex(toPoint));
+            return FindShortestPath(graph.FindVertex(fromPosition), graph.FindVertex(toPosition));
         }
 
-        public int GetShortestPathLength(Vector2 fromPoint, Vector2 toPoint)
+        public int GetShortestPathLength(Position fromPosition, Position toPosition)
         {
-            var shortestPath = FindShortestPath(graph.FindVertex(fromPoint), graph.FindVertex(toPoint));
+            var shortestPath = FindShortestPath(graph.FindVertex(fromPosition), graph.FindVertex(toPosition));
 
             return shortestPath != null ? shortestPath.Count : -1;
         }
 
-        public List<Vector2> FindShortestPath(GraphVertex fromVertex, GraphVertex toVertex)
+        public List<Position> FindShortestPath(GraphVertex fromVertex, GraphVertex toVertex)
         {
             if (fromVertex == null || toVertex == null)
             {
@@ -115,11 +114,11 @@ namespace QuoridorConsole
             }
         }
 
-        private List<Vector2> GetPath(GraphVertex fromVertex, GraphVertex toVertex)
+        private List<Position> GetPath(GraphVertex fromVertex, GraphVertex toVertex)
         {
-            var path = new List<Vector2>();
+            var path = new List<Position>();
 
-            path.Add(toVertex.Point);
+            path.Add(toVertex.Position);
 
             while (fromVertex != toVertex)
             {
@@ -130,7 +129,7 @@ namespace QuoridorConsole
                     return null;
                 }
 
-                path.Add(toVertex.Point);
+                path.Add(toVertex.Position);
             }
 
             return path;

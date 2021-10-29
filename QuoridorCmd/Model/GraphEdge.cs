@@ -1,6 +1,6 @@
-﻿namespace QuoridorConsole
+﻿namespace QuoridorCmd.Model
 {
-    public class GraphEdge
+    class GraphEdge
     {
         public GraphVertex ConnectedVertex { get; }
 
@@ -14,7 +14,7 @@
 
         public override string ToString()
         {
-            return $"[{ConnectedVertex.Point.X};{ConnectedVertex.Point.Y}], Weight: {EdgeWeight}";
+            return $"{ConnectedVertex.Position.Code}, Weight: {EdgeWeight}";
         }
     }
 }

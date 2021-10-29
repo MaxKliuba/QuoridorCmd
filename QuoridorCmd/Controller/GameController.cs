@@ -1,8 +1,10 @@
-﻿using System;
+﻿using QuoridorCmd.AI;
+using QuoridorCmd.Model;
+using QuoridorCmd.View;
+using System;
 using System.Collections.Generic;
-using System.Numerics;
 
-namespace QuoridorConsole
+namespace QuoridorCmd.Controller
 {
     class GameController
     {
@@ -18,7 +20,7 @@ namespace QuoridorConsole
                 {
                     GameProcess gameProcess = new GameProcess();
                     StupidAI stupidAI = null;
-                    List<Vector2> availableMoves = null;
+                    List<Position> availableMoves = null;
                     string message = GetCurrentPlayerMessage(gameProcess.GetCurrentPlayer().Name);
                     bool gameOver = false;
 
@@ -75,7 +77,7 @@ namespace QuoridorConsole
                             }
                             else if (keyGame.Key.Equals(ConsoleKey.Q))
                             {
-                                Vector2 playerMovePosition = GameView.GetPlayerMovePosition();
+                                Position playerMovePosition = GameView.GetPlayerMovePosition();
                                 bool isPlayerMove = false;
 
                                 if (!playerMovePosition.Equals(GameView.WRONG_POSITION))
@@ -102,14 +104,14 @@ namespace QuoridorConsole
                                     }
                                 }
                             }
-                            else if (keyGame.Key.Equals(ConsoleKey.W))
+                            else if (keyGame.Key.Equals(ConsoleKey.W) || keyGame.Key.Equals(ConsoleKey.E))
                             {
-                                Vector2[] wallPosition = GameView.GetWallPosition();
+                                Position wallPosition = GameView.GetWallPosition();
                                 bool isWallAdded = false;
 
-                                if (!wallPosition[0].Equals(GameView.WRONG_POSITION) && !wallPosition[1].Equals(GameView.WRONG_POSITION))
+                                if (!wallPosition.Equals(GameView.WRONG_POSITION))
                                 {
-                                    isWallAdded = gameProcess.AddCurrentPlayerWall(wallPosition[0], wallPosition[1]);
+                                    isWallAdded = gameProcess.AddCurrentPlayerWall(wallPosition, keyGame.Key.Equals(ConsoleKey.W));
                                 }
 
                                 if (!isWallAdded)

@@ -1,4 +1,4 @@
-﻿namespace QuoridorConsole
+﻿namespace QuoridorCmd.Model
 {
     class GraphVertexInfo
     {
