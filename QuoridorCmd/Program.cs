@@ -1,12 +1,14 @@
-﻿using QuoridorCmd.Controller;
+﻿using QuoridorCmd.AI;
+using QuoridorCmd.Controller;
 
-namespace Quoridor.AiTester
+namespace QuoridorCmd
 {
     class Program
     {
         static void Main(string[] args)
         {
-            GameController.Start();
+            //GameController.Start();
+            Tester.Start();
         }
     }
 }

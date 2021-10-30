@@ -128,6 +128,11 @@ namespace QuoridorCmd.Model
             return false;
         }
 
+        public bool AddCurrentPlayerWall(Wall wall)
+        {
+            return AddCurrentPlayerWall(wall.LeftTopPosition, wall.IsVertical);
+        }
+
         public bool AddCurrentPlayerWall(Position leftTopPosition, bool isVertical)
         {
             Player currentPlayer = GetCurrentPlayer();

@@ -19,8 +19,10 @@ namespace QuoridorCmd.AI
             dijkstra = new Dijkstra(gameProcess.Board.Graph);
         }
 
-        public void Move()
+        public string Move()
         {
+            string command = "";
+
             bool isWallAdded = false;
 
             Random random = new Random();
@@ -67,10 +69,13 @@ namespace QuoridorCmd.AI
                         isWallVertical = true;
                     }
 
-                    isWallAdded = gameProcess.AddCurrentPlayerWall(wallLeftTopPosition, isWallVertical);
+                    Wall wall = new Wall(wallLeftTopPosition, isWallVertical);
+
+                    isWallAdded = gameProcess.AddCurrentPlayerWall(wall);
 
                     if (isWallAdded)
                     {
+                        command = $"wall {wall.GetCode()}";
                         break;
                     }
                 }
@@ -78,8 +83,21 @@ namespace QuoridorCmd.AI
 
             if (!isWallAdded)
             {
-                gameProcess.MoveCurrentPlayer(currentPlayerMinShortestPath[0]);
+                Position position = currentPlayerMinShortestPath[0];
+
+                if (dijkstra.GetShortestPathLength(Player.Position, position) > 2)
+                {
+                    command = $"jump {position.Code}";
+                }
+                else
+                {
+                    command = $"move {position.Code}";
+                }
+
+                gameProcess.MoveCurrentPlayer(position);
             }
+
+            return command;
         }
 
         private List<Position> GetMinShortestPath(Player player, List<Position> availableMoves)
