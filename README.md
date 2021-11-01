@@ -7,9 +7,9 @@
 
 ## Запуск
 ```
-.\QuoridorCmd.exe 		// Запуск для програми тестувальника
+.\QuoridorCmd.exe 			// Запуск для програми тестувальника
 
-.\QuoridorCmd.exe --ui 	// Запуск із графічним інтерфейсом користувача
+.\QuoridorCmd.exe --ui 		// Запуск із графічним інтерфейсом користувача
 ```  
 
 [Програма тестувальника](https://github.com/introduction-to-gamedev/ai-tester) 
