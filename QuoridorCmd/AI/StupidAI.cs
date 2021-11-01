@@ -19,10 +19,9 @@ namespace QuoridorCmd.AI
             dijkstra = new Dijkstra(gameProcess.Board.Graph);
         }
 
-        public string Move()
+        public Command Move()
         {
             string command = "";
-
             bool isWallAdded = false;
 
             Random random = new Random();
@@ -30,8 +29,8 @@ namespace QuoridorCmd.AI
             List<Position> currentPlayerMinShortestPath = GetMinShortestPath(Player, gameProcess.GetCurrentPlayerAvailableMoves());
             List<Position> anotherPlayerMinShortestPath = GetMinShortestPath(gameProcess.GetAnotherPlayer(), gameProcess.GetAnotherPlayerAvailableMoves());
 
-            if (currentPlayerMinShortestPath.Count > 1 && (anotherPlayerMinShortestPath.Count <= 2 || (random.Next(0, 4) == 0 && Player.WallCount > 0
-                && currentPlayerMinShortestPath.Count > anotherPlayerMinShortestPath.Count)))
+            if (currentPlayerMinShortestPath.Count > 1 && (anotherPlayerMinShortestPath.Count <= 2 
+                || (random.Next(0, 4) == 0 && Player.WallCount > 0 && currentPlayerMinShortestPath.Count > anotherPlayerMinShortestPath.Count)))
             {
                 Position anotherPlayerPosition = gameProcess.GetAnotherPlayer().Position;
                 Position minShortestPathNextPosition = anotherPlayerMinShortestPath[0];
@@ -75,7 +74,7 @@ namespace QuoridorCmd.AI
 
                     if (isWallAdded)
                     {
-                        command = $"wall {wall.GetCode()}";
+                        command = $"{CommandAction.WALL} {wall.GetCode()}";
                         break;
                     }
                 }
@@ -87,17 +86,17 @@ namespace QuoridorCmd.AI
 
                 if (dijkstra.GetShortestPathLength(Player.Position, position) > 2)
                 {
-                    command = $"jump {position.Code}";
+                    command = $"{CommandAction.JUMP} {position.Code}";
                 }
                 else
                 {
-                    command = $"move {position.Code}";
+                    command = $"{CommandAction.MOVE} {position.Code}";
                 }
 
                 gameProcess.MoveCurrentPlayer(position);
             }
 
-            return command;
+            return Command.ParseString(command);
         }
 
         private List<Position> GetMinShortestPath(Player player, List<Position> availableMoves)

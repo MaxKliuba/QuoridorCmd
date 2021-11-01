@@ -1,7 +1,7 @@
 ﻿using QuoridorCmd.Model;
 using System;
 
-namespace QuoridorCmd.AI
+namespace QuoridorCmd.AI.Tester
 {
     class Tester
     {
@@ -10,9 +10,9 @@ namespace QuoridorCmd.AI
             GameProcess gameProcess = new GameProcess();
             StupidAI stupidAI = null;
 
-            string inputPlayerColor = Console.ReadLine();
+            Command inputPlayerColorCommand = Command.ParseString(Console.ReadLine());
 
-            if (inputPlayerColor.Equals("black"))
+            if (inputPlayerColorCommand.Action.Equals(CommandAction.BLACK))
             {
                 stupidAI = new StupidAI(gameProcess, gameProcess.Player2);
             }
@@ -33,17 +33,22 @@ namespace QuoridorCmd.AI
                     gameProcess.ChangeCurrentPlayer();
                 }
 
-                string inputCommand = Console.ReadLine();
+                bool isCommandCorrect = false;
 
-                if (inputCommand.Contains("wall"))
+                while (!isCommandCorrect)
                 {
-                    Wall wall = new Wall(inputCommand.Substring(5));
-                    gameProcess.AddCurrentPlayerWall(wall);
-                }
-                else
-                {
-                    Position position = new Position(inputCommand.Substring(5));
-                    gameProcess.MoveCurrentPlayer(position);
+                    Command inputCommand = Command.ParseString(Console.ReadLine());
+
+                    if (inputCommand.Action.Equals(CommandAction.WALL))
+                    {
+                        Wall wall = new Wall(inputCommand.Value);
+                        isCommandCorrect = gameProcess.AddCurrentPlayerWall(wall);
+                    }
+                    else
+                    {
+                        Position position = new Position(inputCommand.Value);
+                        isCommandCorrect = gameProcess.MoveCurrentPlayer(position);
+                    }
                 }
 
                 if (gameProcess.CheckCurrentPlayerWin())

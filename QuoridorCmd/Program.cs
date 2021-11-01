@@ -1,5 +1,6 @@
-﻿using QuoridorCmd.AI;
-using QuoridorCmd.Controller;
+﻿using QuoridorCmd.Controller;
+using QuoridorCmd.AI.Tester;
+using System;
 
 namespace QuoridorCmd
 {
@@ -7,8 +8,21 @@ namespace QuoridorCmd
     {
         static void Main(string[] args)
         {
-            //GameController.Start();
-            Tester.Start();
+            if (args.Length > 0)
+            {
+                if (args[0].Equals("--ui"))
+                {
+                    GameController.Start();
+                }
+                else
+                {
+                    Console.WriteLine($"Option '{args[0]}' is unknown.");
+                }
+            }
+            else
+            {
+                Tester.Start();
+            }
         }
     }
 }

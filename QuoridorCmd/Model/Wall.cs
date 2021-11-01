@@ -19,7 +19,7 @@ namespace QuoridorCmd.Model
         public Wall(string code)
         {
             LeftTopPosition = new Position(Array.IndexOf(chars, code[0]), code[1] - '0');
-            IsVertical = code[2].Equals('v');
+            IsVertical = code[2].Equals('v') || code[2].Equals('V');
         }
 
         public string GetCode()

@@ -41,15 +41,15 @@ namespace QuoridorCmd.Model
 
         public void SetCode(string code)
         {
-            Coordinate = FromCodeToCoordinate(code);
-            Code = code;
+            Code = code.ToUpper();
+            Coordinate = FromCodeToCoordinate(Code);
         }
 
         public static string FromCoordinateToCode(Vector2 coordinate)
         {
             char ch = '_';
 
-            if((int)coordinate.X > 0 && (int)coordinate.X < chars.Length)
+            if ((int)coordinate.X > 0 && (int)coordinate.X < chars.Length)
             {
                 ch = chars[(int)coordinate.X];
             }
@@ -59,6 +59,7 @@ namespace QuoridorCmd.Model
 
         public static Vector2 FromCodeToCoordinate(string code)
         {
+            code = code.ToUpper();
 
             return new Vector2(Array.IndexOf(chars, code[0]), code[1] - '0');
         }
