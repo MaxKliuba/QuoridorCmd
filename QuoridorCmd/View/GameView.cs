@@ -8,7 +8,7 @@ namespace QuoridorCmd.View
     {
         private const int WIDTH = 46;
 
-        private const int HEIGHT = 32;
+        private const int HEIGHT = 33;
 
         public static Position WRONG_POSITION = new Position(-1, -1);
 
@@ -27,7 +27,7 @@ namespace QuoridorCmd.View
             Console.WriteLine("  2 - Play with another person");
             Console.WriteLine();
             Console.WriteLine("  Esc - Exit");
-            Console.WriteLine(new string('\n', 16));
+            Console.WriteLine(new string('\n', 17));
             Console.WriteLine("---------------------------------------------");
             Console.WriteLine(" To continue, press the key on the keyboard");
             Console.WriteLine();
@@ -49,7 +49,7 @@ namespace QuoridorCmd.View
             Console.WriteLine("  W - set vertical wall");
             Console.WriteLine("  E - set horizontal wall");
             Console.WriteLine("  Esc - Back / Exit");
-            Console.WriteLine(new string('\n', 16));
+            Console.WriteLine(new string('\n', 17));
             Console.WriteLine("---------------------------------------------");
             Console.WriteLine("               By MaxClub & Co               ");
             Console.WriteLine();
