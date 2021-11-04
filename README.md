@@ -16,7 +16,7 @@
 
 
 ## Результати тестів
-![Run results](https://github.com/MaxKliuba/QuoridorConsole/blob/master/img/run_results.png?raw=true)
+![Run results](https://github.com/MaxKliuba/QuoridorConsole/blob/master/img/run_results.PNG?raw=true)
 
 ## Скріншоти проекту
 ![Menu](https://github.com/MaxKliuba/QuoridorConsole/blob/master/img/img1.png?raw=true)
